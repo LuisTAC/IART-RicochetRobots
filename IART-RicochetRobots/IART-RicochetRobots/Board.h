@@ -8,12 +8,11 @@
 
 using namespace std;
 
+enum Direction {N, E, S, W};
+
 class Board {
 private:
-	Robot robotBlue;
-	Robot robotGreen;
-	Robot robotRed;
-	Robot robotYellow;
+	Robot robots[4]; //Blue, Green, Red, Yellow
 
 	vector <pair<int, int> > targetsBlue;
 	vector <pair<int, int> > targetsGreen;
@@ -34,16 +33,18 @@ public:
 	vector <pair<int, int> > getTargetsRed();
 	vector <pair<int, int> > getTargetsYellow();
 	vector<Wall> getWalls();
+
+	void moveRobot(Color c, Direction d);
 };
 
 Board::Board(int type) {
 	switch (type)
 	{
 	case 1:
-		robotBlue = Robot(B, 13, 6);
-		robotGreen = Robot(G, 2, 5);
-		robotRed = Robot(R, 11, 7);
-		robotYellow = Robot(Y, 0, 4);
+		robots[0] = Robot(B, 13, 6);
+		robots[1] = Robot(G, 2, 5);
+		robots[2] = Robot(R, 11, 7);
+		robots[3] = Robot(Y, 0, 4);
 
 		targetsBlue.push_back(pair<int, int>(6, 5));
 		targetsBlue.push_back(pair<int, int>(12, 6));
@@ -121,16 +122,16 @@ Board::Board(int type) {
 }
 
 Robot Board::getRobotBlue() {
-	return robotBlue;
+	return robots[B];
 }
 Robot Board::getRobotGreen() {
-	return robotGreen;
+	return robots[G];
 }
 Robot Board::getRobotRed() {
-	return robotRed;
+	return robots[R];
 }
 Robot Board::getRobotYellow() {
-	return robotYellow;
+	return robots[Y];
 }
 vector <pair<int, int> > Board::getTargetsBlue() {
 	return targetsBlue;
@@ -146,4 +147,8 @@ vector <pair<int, int> > Board::getTargetsYellow() {
 }
 vector<Wall> Board::getWalls() {
 	return walls;
+}
+
+void Board::moveRobot(Color c, Direction d) {
+
 }

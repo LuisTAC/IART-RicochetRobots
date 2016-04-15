@@ -21,6 +21,6 @@ Wall::Wall(Orientation or , int x, int y) {
 Orientation Wall::getOrientation() {
 	return orientation;
 }
-pair<int, int> Robot::getCoords() {
+pair<int, int> Wall::getCoords() {
 	return coords;
 }
