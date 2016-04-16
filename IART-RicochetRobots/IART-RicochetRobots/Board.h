@@ -134,16 +134,16 @@ Robot Board::getRobotYellow() {
 	return robots[Y];
 }
 vector <pair<int, int> > Board::getTargetsBlue() {
-	return targetsBlue;
+	return targets[B];
 }
 vector <pair<int, int> > Board::getTargetsGreen() {
-	return targetsGreen;
+	return targets[G];
 }
 vector <pair<int, int> > Board::getTargetsRed() {
-	return targetsRed;
+	return targets[R];
 }
 vector <pair<int, int> > Board::getTargetsYellow() {
-	return targetsYellow;
+	return targets[Y];
 }
 vector<Wall> Board::getWalls() {
 	return walls;
@@ -180,6 +180,12 @@ void Board::moveRobot(Color clr, Direction dir) {
 				wall.getCoords().second<coordsRobot.second && wall.getCoords().second>max)
 					max = wall.getCoords().second;
 		}
+		for (unsigned int i = 0; i < 4; i++) {
+			if (i == clr) continue;
+			Robot robot2 = robots[i];
+			if (robot2.getCoords().first == coordsRobot.first && robot2.getCoords().second<coordsRobot.second &&
+				robot2.getCoords().second>max) max = robot2.getCoords().second;
+		}
 		if (max != 0) robot.setCoords(coordsRobot.first, max);
 		break;
 	case E:
@@ -190,6 +196,12 @@ void Board::moveRobot(Color clr, Direction dir) {
 			if (wall.getOrientation() == V && wall.getCoords().second == coordsRobot.second &&
 				wall.getCoords().first>coordsRobot.first && wall.getCoords().first<min)
 				min = wall.getCoords().first;
+		}
+		for (unsigned int i = 0; i < 4; i++) {
+			if (i == clr) continue;
+			Robot robot2 = robots[i];
+			if (robot2.getCoords().second == coordsRobot.second && robot2.getCoords().first>coordsRobot.first &&
+				robot2.getCoords().first<min) min = robot2.getCoords().first;
 		}
 		if (min != 15) robot.setCoords(min, coordsRobot.second);
 		break;
@@ -202,6 +214,12 @@ void Board::moveRobot(Color clr, Direction dir) {
 				wall.getCoords().second>coordsRobot.second && wall.getCoords().second<min)
 				min = wall.getCoords().second;
 		}
+		for (unsigned int i = 0; i < 4; i++) {
+			if (i == clr) continue;
+			Robot robot2 = robots[i];
+			if (robot2.getCoords().first == coordsRobot.first && robot2.getCoords().second>coordsRobot.second &&
+				robot2.getCoords().second<min) min = robot2.getCoords().second;
+		}
 		if (min != 15) robot.setCoords(coordsRobot.first, min);
 		break;
 	case W:
@@ -212,6 +230,12 @@ void Board::moveRobot(Color clr, Direction dir) {
 			if (wall.getOrientation() == V && wall.getCoords().second == coordsRobot.second &&
 				wall.getCoords().first<coordsRobot.first && wall.getCoords().first>max)
 				max = wall.getCoords().first;
+		}
+		for (unsigned int i = 0; i < 4; i++) {
+			if (i == clr) continue;
+			Robot robot2 = robots[i];
+			if (robot2.getCoords().second == coordsRobot.second && robot2.getCoords().first<coordsRobot.first &&
+				robot2.getCoords().first>max) max = robot2.getCoords().first;
 		}
 		if (max != 0) robot.setCoords(max, coordsRobot.second);
 		break;
