@@ -21,19 +21,20 @@ public:
 	pair<int, int> getCoords();
 
 	void setCoords(int x, int y);
+
+	friend bool operator==(const Robot& r1, const Robot& r2);
+	friend bool operator!=(const Robot& r1, const Robot& r2);
 };
 
 Robot::Robot() {
 	color = B;
 	start = coords = pair<int, int>(-1, -1);
 }
-
 Robot::Robot(Color c, int x, int y) {
 	color = c;
 	start = std::pair<int, int>(x, y);
 	coords = std::pair<int, int>(x, y);
 }
-
 Robot::Robot(Robot const &r)
 {
 	this->color = r.color;
@@ -57,3 +58,13 @@ void Robot::setCoords(int x, int y) {
 	this->coords.second = y;
 }
 
+bool operator==(const Robot& r1, const Robot& r2) {
+	if (r1.color != r2.color) return false;
+	if (r1.start != r2.start) return false;
+	if (r1.coords != r2.coords) return false;
+
+	return true;
+}
+bool operator!=(const Robot& r1, const Robot& r2) {
+	return !(r1 == r2);
+}

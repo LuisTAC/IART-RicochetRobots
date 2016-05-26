@@ -40,6 +40,7 @@ public:
 	vector <pair<int, int> > getTargetsYellow() const;
 	vector<Wall> getWalls() const;
 	char getCurrGoal() const;
+	vector<char> getDoneGoals();
 	string toString() const;
 
 	bool moveRobot(Color clr, Direction dir);
@@ -48,6 +49,8 @@ public:
 	
 	void setInitCurrGoal();
 
+	friend bool operator==(const Board& b1, const Board& b2);
+	friend bool operator!=(const Board& b1, const Board& b2);
 	friend ostream& operator<<(ostream& os, const Board& board);
 };
 
@@ -204,6 +207,9 @@ vector<Wall> Board::getWalls() const {
 char Board::getCurrGoal() const
 {
 	return this->currGoal;
+}
+vector<char> Board::getDoneGoals() {
+	return doneGoals;
 }
 string Board::toString() const {
 	//top line (walls)
@@ -377,9 +383,6 @@ void Board::setInitCurrGoal()
 	it = set_difference(goals.begin(), goals.end(), doneGoals.begin(), doneGoals.end(), availGoals.begin());
 	availGoals.resize(it - availGoals.begin());
 
-	/* initialize random seed: */
-	srand(time(NULL));
-
 	int randInd = rand() % (availGoals.size());
 
 	this->currGoal = availGoals[randInd];
@@ -480,7 +483,25 @@ vector<Board> Board::createDescNodes()
 	}
 	return res;
 }
+bool operator==(const Board& b1, const Board& b2) {
+	for (unsigned int i = 0; i < 4; i++) {
+		if (b1.robots[i] != b2.robots[i]) return false;
+	}
 
+	for (unsigned int i = 0; i < 4; i++) {
+		if (b1.targets[i] != b2.targets[i]) return false;
+	}
+
+	if (b1.walls != b2.walls) return false;
+
+	if (b1.currGoal != b2.currGoal) return false;
+
+	if (b1.doneGoals != b2.doneGoals) return false;
+	return true;
+}
+bool operator!=(const Board& b1, const Board& b2) {
+	return !(b1 == b2);
+}
 ostream& operator<<(ostream& os, Board& board)
 {
 	os << board.toString().c_str();
