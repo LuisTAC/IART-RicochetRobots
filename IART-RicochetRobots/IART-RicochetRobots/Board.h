@@ -3,6 +3,9 @@
 #include <vector>
 #include <iostream>
 #include <cmath>
+#include <ctime>
+#include <random>
+#include <algorithm>
 
 #include "Robot.h"
 #include "Wall.h"
@@ -20,8 +23,12 @@ private:
 
 	vector<Wall> walls;
 
+	char currGoal;
+	vector<char> doneGoals;
+
 public:
 	Board(int type);
+	Board(Board const &b);
 
 	Robot getRobotBlue() const;
 	Robot getRobotGreen() const;
@@ -32,9 +39,14 @@ public:
 	vector <pair<int, int> > getTargetsRed() const;
 	vector <pair<int, int> > getTargetsYellow() const;
 	vector<Wall> getWalls() const;
+	char getCurrGoal() const;
 	string toString() const;
 
-	void moveRobot(Color clr, Direction dir);
+	bool moveRobot(Color clr, Direction dir);
+
+	vector<Board> createDescNodes();
+	
+	void setInitCurrGoal();
 
 	friend ostream& operator<<(ostream& os, const Board& board);
 };
@@ -125,6 +137,8 @@ Board::Board(int type) {
 		walls.push_back(Wall(H, 15, 4));
 		walls.push_back(Wall(H, 15, 9));
 
+		setInitCurrGoal();
+
 		break;
 		case 2:
 		break;
@@ -132,6 +146,32 @@ Board::Board(int type) {
 		cout << "Invalid Board type [1-1]";
 		break;
 	}
+}
+Board::Board(Board const &b)
+{
+	// walls
+	for (int i = 0; i < b.walls.size(); i++)
+	{
+		this->walls.push_back(Wall(b.walls[i]));
+	}
+
+	// robots
+	for (int i = 0; i < 4; i++)
+	{
+		this->robots[i] = Robot(b.robots[i]);
+	}
+
+	// targets
+	for (int i = 0; i < 4; i++)
+	{
+		this->targets[i] = vector<pair<int, int> >(b.targets[i]);
+	}
+
+	// current goals
+	this->currGoal = b.currGoal;
+
+	// done goals
+	this->doneGoals = vector<char>(b.doneGoals);
 }
 
 Robot Board::getRobotBlue() const {
@@ -160,6 +200,10 @@ vector <pair<int, int> > Board::getTargetsYellow() const {
 }
 vector<Wall> Board::getWalls() const {
 	return walls;
+}
+char Board::getCurrGoal() const
+{
+	return this->currGoal;
 }
 string Board::toString() const {
 	//top line (walls)
@@ -325,31 +369,47 @@ string Board::toString() const {
 	return ret;
 }
 
-void Board::moveRobot(Color clr, Direction dir) {
-	Robot robot = robots[clr];
-	pair<int, int> coordsRobot = robot.getCoords();
+void Board::setInitCurrGoal()
+{
+	vector<char> availGoals(16);
+	vector<char> goals = { 'A','C','D','E' ,'F','H','I','J', 'Q','S','T','U', 'V','W','X','Z' };
+	vector<char>::iterator it;
+	it = set_difference(goals.begin(), goals.end(), doneGoals.begin(), doneGoals.end(), availGoals.begin());
+	availGoals.resize(it - availGoals.begin());
+
+	/* initialize random seed: */
+	srand(time(NULL));
+
+	int randInd = rand() % (availGoals.size());
+
+	this->currGoal = availGoals[randInd];
+}
+
+bool Board::moveRobot(Color clr, Direction dir) {
+	pair<int, int> coordsRobot = robots[clr].getCoords();
 	int max = 0;
 	int min = 15;
 	switch (dir)
 	{
 	case N:
-		if (coordsRobot.second == 0) return;
+		if (coordsRobot.second == 0) return false;
 		for (unsigned int i = 0; i < walls.size(); i++) {
 			Wall wall = walls[i];
 			if (wall.getOrientation() == H && wall.getCoords().first == coordsRobot.first &&
 				wall.getCoords().second<coordsRobot.second && wall.getCoords().second>max)
-					max = wall.getCoords().second;
+					max = wall.getCoords().second+1;
 		}
 		for (unsigned int i = 0; i < 4; i++) {
 			if (i == clr) continue;
 			Robot robot2 = robots[i];
 			if (robot2.getCoords().first == coordsRobot.first && robot2.getCoords().second<coordsRobot.second &&
-				robot2.getCoords().second>max) max = robot2.getCoords().second;
+				robot2.getCoords().second>max) max = robot2.getCoords().second+1;
 		}
-		if (max != 0) robot.setCoords(coordsRobot.first, max);
+		if (max != robots[clr].getCoords().second) robots[clr].setCoords(coordsRobot.first, max);
+		return coordsRobot.second != robots[clr].getCoords().second;
 		break;
 	case E:
-		if (coordsRobot.first == 15) return;
+		if (coordsRobot.first == 15) return false;
 		for (unsigned int i = 0; i < walls.size(); i++) {
 			Wall wall = walls[i];
 			if (wall.getOrientation() == V && wall.getCoords().second == coordsRobot.second &&
@@ -360,12 +420,13 @@ void Board::moveRobot(Color clr, Direction dir) {
 			if (i == clr) continue;
 			Robot robot2 = robots[i];
 			if (robot2.getCoords().second == coordsRobot.second && robot2.getCoords().first>coordsRobot.first &&
-				robot2.getCoords().first<min) min = robot2.getCoords().first;
+				robot2.getCoords().first<min) min = robot2.getCoords().first-1;
 		}
-		if (min != 15) robot.setCoords(min, coordsRobot.second);
+		if (min != robots[clr].getCoords().first) robots[clr].setCoords(min, coordsRobot.second);
+		return coordsRobot.first != robots[clr].getCoords().first;
 		break;
 	case S:
-		if (coordsRobot.second == 15) return;
+		if (coordsRobot.second == 15) return false;
 		for (unsigned int i = 0; i < walls.size(); i++) {
 			Wall wall = walls[i];
 			if (wall.getOrientation() == H && wall.getCoords().first == coordsRobot.first &&
@@ -376,27 +437,48 @@ void Board::moveRobot(Color clr, Direction dir) {
 			if (i == clr) continue;
 			Robot robot2 = robots[i];
 			if (robot2.getCoords().first == coordsRobot.first && robot2.getCoords().second>coordsRobot.second &&
-				robot2.getCoords().second<min) min = robot2.getCoords().second;
+				robot2.getCoords().second<min) min = robot2.getCoords().second-1;
 		}
-		if (min != 15) robot.setCoords(coordsRobot.first, min);
+		if (min != robots[clr].getCoords().second) robots[clr].setCoords(coordsRobot.first, min);
+		return coordsRobot.second != robots[clr].getCoords().second;
 		break;
 	case W:
-		if (coordsRobot.first == 0) return;
+		if (coordsRobot.first == 0) return false;
 		for (unsigned int i = 0; i < walls.size(); i++) {
 			Wall wall = walls[i];
 			if (wall.getOrientation() == V && wall.getCoords().second == coordsRobot.second &&
 				wall.getCoords().first<coordsRobot.first && wall.getCoords().first>max)
-				max = wall.getCoords().first;
+				max = wall.getCoords().first+1;
 		}
 		for (unsigned int i = 0; i < 4; i++) {
 			if (i == clr) continue;
 			Robot robot2 = robots[i];
 			if (robot2.getCoords().second == coordsRobot.second && robot2.getCoords().first<coordsRobot.first &&
-				robot2.getCoords().first>max) max = robot2.getCoords().first;
+				robot2.getCoords().first>max) max = robot2.getCoords().first+1;
 		}
-		if (max != 0) robot.setCoords(max, coordsRobot.second);
+		if (max != robots[clr].getCoords().first) robots[clr].setCoords(max, coordsRobot.second);
+		return coordsRobot.first != robots[clr].getCoords().first;
 		break;
 	}
+
+	return false;
+}
+
+vector<Board> Board::createDescNodes()
+{
+	vector<Board> res;
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = 0; j < 4; j++)
+		{
+			Board b1(*this);
+			if (b1.moveRobot((Color)i, (Direction)j))
+			{
+				res.push_back(b1);
+			}
+		}
+	}
+	return res;
 }
 
 ostream& operator<<(ostream& os, Board& board)

@@ -8,6 +8,7 @@ private:
 	pair<int, int> coords;
 public:
 	Wall(Orientation or , int x, int y);
+	Wall(Wall const &w);
 
 	Orientation getOrientation();
 	pair<int, int> getCoords();
@@ -16,6 +17,12 @@ public:
 Wall::Wall(Orientation or , int x, int y) {
 	orientation = or ;
 	coords = std::pair<int, int>(x, y);
+}
+
+
+Wall::Wall(Wall const &w) {
+	orientation = w.orientation;
+	coords = w.coords;
 }
 
 Orientation Wall::getOrientation() {

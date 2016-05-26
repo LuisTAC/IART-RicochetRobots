@@ -14,6 +14,7 @@ private:
 public:
 	Robot();
 	Robot(Color c, int x, int y);
+	Robot(Robot const &r);
 
 	Color getColor();
 	pair<int, int> getStart();
@@ -33,6 +34,14 @@ Robot::Robot(Color c, int x, int y) {
 	coords = std::pair<int, int>(x, y);
 }
 
+Robot::Robot(Robot const &r)
+{
+	this->color = r.color;
+	this->coords = r.coords;
+	this->start = r.start;
+}
+
+
 Color Robot::getColor() {
 	return color;
 }
@@ -44,6 +53,7 @@ pair<int, int> Robot::getCoords() {
 }
 
 void Robot::setCoords(int x, int y) {
-	coords = pair<int, int>(x, y);
+	this->coords.first = x;
+	this->coords.second = y;
 }
 
