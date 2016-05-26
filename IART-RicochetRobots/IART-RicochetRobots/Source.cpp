@@ -5,7 +5,11 @@
 #include "Board.h"
 using namespace std;
 
-void a_star() {
+void a_star(Board start) {
+	// The set of currently discovered nodes still to be evaluated.
+	vector<Board> openSet = { start };
+	// The set of nodes already evaluated.
+	vector<Board> closedSet;
 
 }
 

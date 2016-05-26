@@ -1,3 +1,6 @@
+#ifndef ROBOT_H
+#define ROBOT_H
+
 #pragma once
 
 #include <utility>
@@ -68,3 +71,5 @@ bool operator==(const Robot& r1, const Robot& r2) {
 bool operator!=(const Robot& r1, const Robot& r2) {
 	return !(r1 == r2);
 }
+
+#endif

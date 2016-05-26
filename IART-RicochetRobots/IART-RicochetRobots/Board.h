@@ -1,3 +1,6 @@
+#ifndef BOARD_H
+#define BOARD_H
+
 #pragma once
 
 #include <vector>
@@ -507,3 +510,5 @@ ostream& operator<<(ostream& os, Board& board)
 	os << board.toString().c_str();
 	return os;
 }
+
+#endif

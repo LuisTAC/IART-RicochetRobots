@@ -1,3 +1,6 @@
+#ifndef WALL_H
+#define WALL_H
+
 #pragma once
 
 enum Orientation { H, V };
@@ -41,3 +44,5 @@ bool operator==(const Wall& w1, const Wall& w2) {
 bool operator!=(const Wall& w1, const Wall& w2) {
 	return !(w1 == w2);
 }
+
+#endif

@@ -147,6 +147,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Board.h" />
+    <ClInclude Include="BoardNode.h" />
     <ClInclude Include="Robot.h" />
     <ClInclude Include="Wall.h" />
   </ItemGroup>
