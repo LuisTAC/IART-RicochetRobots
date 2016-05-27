@@ -22,12 +22,12 @@ private:
 	Robot robots[4]; //Blue;      Green;      Red;      Yellow
 					 //A,C,D,E    F,H,I,J     Q,S,T,U   V,W,X,Z
 
-	vector <pair<int, int> > targets[4];
+	vector<pair<int, int> > targets;
 
 	vector<Wall> walls;
 
-	char currGoal;
-	vector<char> doneGoals;
+	int currGoal;
+	vector<int> doneGoals;
 
 public:
 	Board(int type);
@@ -37,20 +37,23 @@ public:
 	Robot getRobotGreen() const;
 	Robot getRobotRed() const;
 	Robot getRobotYellow() const;
-	vector <pair<int, int> > getTargetsBlue() const;
-	vector <pair<int, int> > getTargetsGreen() const;
-	vector <pair<int, int> > getTargetsRed() const;
-	vector <pair<int, int> > getTargetsYellow() const;
+	vector<pair <int, int> > getTargets() const;
+	vector<pair<int, int> > getTargetsBlue() const;
+	vector<pair<int, int> > getTargetsGreen() const;
+	vector<pair<int, int> > getTargetsRed() const;
+	vector<pair<int, int> > getTargetsYellow() const;
 	vector<Wall> getWalls() const;
-	char getCurrGoal() const;
-	vector<char> getDoneGoals();
+	int getCurrGoal() const;
+	vector<int> getDoneGoals();
+	bool checkFinished();
 	string toString() const;
+
+	bool setCurrGoal(int goal);
+	void setRandomCurrGoal();
 
 	bool moveRobot(Color clr, Direction dir);
 
 	vector<Board> createDescNodes();
-	
-	void setInitCurrGoal();
 
 	friend bool operator==(const Board& b1, const Board& b2);
 	friend bool operator!=(const Board& b1, const Board& b2);
@@ -61,7 +64,7 @@ Board::Board(int type) {
 	switch (type)
 	{
 	case 1:
-		robots[0] = Robot(B, 13, 6);
+		robots[0] = Robot(B, 6, 5);
 		robots[1] = Robot(G, 2, 5);
 		robots[2] = Robot(R, 11, 7);
 		robots[3] = Robot(Y, 0, 4);
@@ -71,25 +74,25 @@ Board::Board(int type) {
 		//Lua
 		//Estrela
 
-		targets[B].push_back(pair<int, int>(6, 5));
-		targets[B].push_back(pair<int, int>(12, 6));
-		targets[B].push_back(pair<int, int>(6, 10));
-		targets[B].push_back(pair<int, int>(13, 11));
+		targets.push_back(pair<int, int>(6, 5));
+		targets.push_back(pair<int, int>(12, 6));
+		targets.push_back(pair<int, int>(6, 10));
+		targets.push_back(pair<int, int>(13, 11));
 
-		targets[G].push_back(pair<int, int>(3, 14));
-		targets[G].push_back(pair<int, int>(1, 2));
-		targets[G].push_back(pair<int, int>(9, 13));
-		targets[G].push_back(pair<int, int>(9, 1));
+		targets.push_back(pair<int, int>(3, 14));
+		targets.push_back(pair<int, int>(1, 2));
+		targets.push_back(pair<int, int>(9, 13));
+		targets.push_back(pair<int, int>(9, 1));
 
-		targets[R].push_back(pair<int, int>(10, 4));
-		targets[R].push_back(pair<int, int>(14, 14));
-		targets[R].push_back(pair<int, int>(3, 6));
-		targets[R].push_back(pair<int, int>(1, 13));
+		targets.push_back(pair<int, int>(10, 4));
+		targets.push_back(pair<int, int>(14, 14));
+		targets.push_back(pair<int, int>(3, 6));
+		targets.push_back(pair<int, int>(1, 13));
 
-		targets[Y].push_back(pair<int, int>(8, 10));
-		targets[Y].push_back(pair<int, int>(4, 9));
-		targets[Y].push_back(pair<int, int>(14, 2));
-		targets[Y].push_back(pair<int, int>(6, 1));
+		targets.push_back(pair<int, int>(8, 10));
+		targets.push_back(pair<int, int>(4, 9));
+		targets.push_back(pair<int, int>(14, 2));
+		targets.push_back(pair<int, int>(6, 1));
 
 		walls.push_back(Wall(V, 4, 0));
 		walls.push_back(Wall(V, 10, 0));
@@ -143,7 +146,7 @@ Board::Board(int type) {
 		walls.push_back(Wall(H, 15, 4));
 		walls.push_back(Wall(H, 15, 9));
 
-		setInitCurrGoal();
+		setRandomCurrGoal();
 
 		break;
 		case 2:
@@ -168,16 +171,13 @@ Board::Board(Board const &b)
 	}
 
 	// targets
-	for (int i = 0; i < 4; i++)
-	{
-		this->targets[i] = vector<pair<int, int> >(b.targets[i]);
-	}
+	this->targets = vector<pair<int, int> >(b.targets);
 
 	// current goals
 	this->currGoal = b.currGoal;
 
 	// done goals
-	this->doneGoals = vector<char>(b.doneGoals);
+	this->doneGoals = vector<int>(b.doneGoals);
 }
 
 Robot Board::getRobotBlue() const {
@@ -192,27 +192,33 @@ Robot Board::getRobotRed() const {
 Robot Board::getRobotYellow() const {
 	return robots[Y];
 }
-vector <pair<int, int> > Board::getTargetsBlue() const {
-	return targets[B];
+vector <pair<int, int> > Board::getTargets() const {
+	return targets;
 }
-vector <pair<int, int> > Board::getTargetsGreen() const {
-	return targets[G];
+vector<pair<int, int> > Board::getTargetsBlue() const {
+	return vector<pair<int, int> >(targets.begin(), targets.begin() + 4);
 }
-vector <pair<int, int> > Board::getTargetsRed() const {
-	return targets[R];
+vector<pair<int, int> > Board::getTargetsGreen() const {
+	return vector<pair<int, int> >(targets.begin()+4, targets.begin() + 8);
 }
-vector <pair<int, int> > Board::getTargetsYellow() const {
-	return targets[Y];
+vector<pair<int, int> > Board::getTargetsRed() const {
+	return vector<pair<int, int> >(targets.begin() + 8, targets.begin() + 12);
+}
+vector<pair<int, int> > Board::getTargetsYellow() const {
+	return vector<pair<int, int> >(targets.begin() + 12, targets.begin() + 16);
 }
 vector<Wall> Board::getWalls() const {
 	return walls;
 }
-char Board::getCurrGoal() const
+int Board::getCurrGoal() const
 {
 	return this->currGoal;
 }
-vector<char> Board::getDoneGoals() {
+vector<int> Board::getDoneGoals() {
 	return doneGoals;
+}
+bool Board::checkFinished() {
+	return (targets[currGoal] == robots[(currGoal + 1) / 4].getCoords());
 }
 string Board::toString() const {
 	//top line (walls)
@@ -307,34 +313,16 @@ string Board::toString() const {
 		}
 	}
 
-	//targets - blue
-	char targetsBlueRep[] = {'A','C','D','E'};
-	for (unsigned int i = 0; i < targets[B].size(); i++) {
-		int x = targets[B][i].first;
-		int y = targets[B][i].second;
-		str[y*2][x*2] = targetsBlueRep[i];
+	//targets
+	char goals[] = { 'A','C','D','E' ,'F','H','I','J', 'Q','S','T','U', 'V','W','X','Z' };
+	for (unsigned int i = 0; i < targets.size(); i++) {
+		int x = targets[i].first;
+		int y = targets[i].second;
+		str[y * 2][x * 2] = goals[i];
 	}
-	//targets - green
-	char targetsGreenRep [] = { 'F','H','I','J' };
-	for (unsigned int i = 0; i < targets[G].size(); i++) {
-		int x = targets[G][i].first;
-		int y = targets[G][i].second;
-		str[y * 2][x * 2] = targetsGreenRep[i];
-	}
-	//targets - red
-	char targetsRedRep [] = { 'Q','S','T','U' };
-	for (unsigned int i = 0; i < targets[R].size(); i++) {
-		int x = targets[R][i].first;
-		int y = targets[R][i].second;
-		str[y * 2][x * 2] = targetsRedRep[i];
-	}
-	//targets - yellow
-	char targetsYellowRep [] = { 'V','W','X','Z' };
-	for (unsigned int i = 0; i < targets[Y].size(); i++) {
-		int x = targets[Y][i].first;
-		int y = targets[Y][i].second;
-		str[y * 2][x * 2] = targetsYellowRep[i];
-	}
+
+	//goal
+	str[15][15] = goals[currGoal];
 
 	//robots
 	for (unsigned int i = 0; i < 4; i++) {
@@ -359,8 +347,8 @@ string Board::toString() const {
 		str[y*2][x*2] = clr;
 	}
 
-	string ret = "";
 	//output
+	string ret = "";
 	for (unsigned int i = 0; i < top.size(); i++) {
 		ret += top[i];
 	}
@@ -378,17 +366,21 @@ string Board::toString() const {
 	return ret;
 }
 
-void Board::setInitCurrGoal()
+bool Board::setCurrGoal(int goal) {
+	if (goal >= 0 && goal <= 15) {
+		currGoal = goal;
+		return true;
+	}
+	return false;
+}
+void Board::setRandomCurrGoal()
 {
-	vector<char> availGoals(16);
-	vector<char> goals = { 'A','C','D','E' ,'F','H','I','J', 'Q','S','T','U', 'V','W','X','Z' };
-	vector<char>::iterator it;
-	it = set_difference(goals.begin(), goals.end(), doneGoals.begin(), doneGoals.end(), availGoals.begin());
-	availGoals.resize(it - availGoals.begin());
+	int randInd;
+	do {
+		randInd = rand() % (16);
+	} while (find(doneGoals.begin(),doneGoals.end(),randInd)!=doneGoals.end());
 
-	int randInd = rand() % (availGoals.size());
-
-	this->currGoal = availGoals[randInd];
+	this->currGoal = randInd;
 }
 
 bool Board::moveRobot(Color clr, Direction dir) {
@@ -486,6 +478,7 @@ vector<Board> Board::createDescNodes()
 	}
 	return res;
 }
+
 bool operator==(const Board& b1, const Board& b2) {
 	for (unsigned int i = 0; i < 4; i++) {
 		if (b1.robots[i] != b2.robots[i]) return false;
