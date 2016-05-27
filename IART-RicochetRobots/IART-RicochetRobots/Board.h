@@ -30,6 +30,7 @@ private:
 	vector<int> doneGoals;
 
 public:
+	Board();
 	Board(int type);
 	Board(Board const &b);
 
@@ -60,6 +61,9 @@ public:
 	friend ostream& operator<<(ostream& os, const Board& board);
 };
 
+Board::Board() {
+	currGoal = -1;
+}
 Board::Board(int type) {
 	switch (type)
 	{

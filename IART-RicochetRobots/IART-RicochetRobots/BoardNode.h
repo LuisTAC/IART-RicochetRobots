@@ -17,7 +17,7 @@ private:
 	vector<BoardNode*> children;
 
 public:
-	BoardNode(Board b, int(*heurFunction)(Board b));
+	BoardNode(Board b, function<int(Board)> heurFunction);
 
 	Board getState() const;
 	int getCost() const;
@@ -34,7 +34,7 @@ public:
 	friend bool operator<(const BoardNode& r1, const BoardNode& r2);
 };
 
-BoardNode::BoardNode(Board b, int (*heurFunction)(Board b)) {
+BoardNode::BoardNode(Board b, function<int(Board)> heurFunction) {
 	state = b;
 	heurValue = heurFunction(state);
 }

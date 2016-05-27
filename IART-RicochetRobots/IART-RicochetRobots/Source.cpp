@@ -1,14 +1,12 @@
 #include <iostream>
 
-#include <boost\graph\undirected_graph.hpp>
-
 #include "BoardNode.h"
+
 using namespace std;
 
 int heurFunc(Board b) {
 	return 0;
 }
-
 
 vector<Board> a_star(Board start) {
 	
