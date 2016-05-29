@@ -115,6 +115,7 @@ public class Solver {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("DONE!");
 	}
 
 }
