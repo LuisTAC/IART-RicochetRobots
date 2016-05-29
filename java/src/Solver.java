@@ -41,6 +41,7 @@ public class Solver {
 		Board b = new Board(1);
 		b.setCurrGoal(12);
 		
+		/*
 		ArrayList<Board> res = bfs(b);
 		
 		FileOutputStream out = null;
@@ -59,7 +60,7 @@ public class Solver {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+		}*/
 	}
 
 }

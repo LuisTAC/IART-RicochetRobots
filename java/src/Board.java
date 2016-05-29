@@ -243,6 +243,114 @@ public class Board {
 		return false;
 	}
 	
+	// heuristic functions
+		
+	boolean checkGridFilled(int grid[][]) {
+		for (int i = 0; i < grid.length; i++) {
+			for (int j = 0; j < grid.length; j++) {
+				if (grid[i][j] == -1)
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	void heuristicFiller(int v[][], int x, int y, int moveNum) {
+		int max;
+		int min;
+
+		// N
+		max = -1;
+		for (int i = 0; i < walls.size(); i++) {
+			Wall wall = walls.get(i);
+			if (wall.getOrientation() == Orientation.H && wall.getCoords()[0] == x && wall.getCoords()[1] < y
+					&& wall.getCoords()[1] > max)
+				max = wall.getCoords()[1] + 1;
+		}
+		for (int i = y - 1; i >= Math.max(max, 0); i--) {
+			if (v[i][x] == -1)
+				v[i][x] = moveNum + 1;
+		}
+		// E
+		min = 16;
+		for (int i = 0; i < walls.size(); i++) {
+			Wall wall = walls.get(i);
+			if (wall.getOrientation() == Orientation.V && wall.getCoords()[1] == y && wall.getCoords()[0] >= x
+					&& wall.getCoords()[0] < min)
+				min = wall.getCoords()[0];
+		}
+		for (int i = x + 1; i <= Math.min(min, 15); i++) {
+			if (v[y][i] == -1)
+				v[y][i] = moveNum + 1;
+		}
+
+		// S
+		min = 16;
+		for (int i = 0; i < walls.size(); i++) {
+			Wall wall = walls.get(i);
+			if (wall.getOrientation() == Orientation.H && wall.getCoords()[0] == x && wall.getCoords()[1] >= y
+					&& wall.getCoords()[1] < min)
+				min = wall.getCoords()[1];
+		}
+		for (int i = y + 1; i <= Math.min(min, 15); i++) {
+			if (v[i][x] == -1)
+				v[i][x] = moveNum + 1;
+		}
+
+		// W
+		max = -1;
+		for (int i = 0; i < walls.size(); i++) {
+			Wall wall = walls.get(i);
+			if (wall.getOrientation() == Orientation.V && wall.getCoords()[1] == y && wall.getCoords()[0] < x
+					&& wall.getCoords()[0] > max)
+				max = wall.getCoords()[0] + 1;
+		}
+		for (int i = x - 1; i >= Math.max(max, 0); i--) {
+			if (v[y][i] == -1)
+				v[y][i] = moveNum + 1;
+		}
+	}
+
+	int[][] heuristicPreComp() {
+		int[][] retGrid = new int[16][16];
+
+		int goalIndex = this.getCurrGoal();
+
+		int[] goalCoords = { this.getTargets()[goalIndex][0], this.getTargets()[goalIndex][1] };
+
+		for (int i = 0; i < retGrid.length; i++) {
+			for (int j = 0; j < retGrid.length; j++) {
+				retGrid[i][j] = -1;
+			}
+		}
+		retGrid[7][7] = -2;
+		retGrid[7][8] = -2;
+		retGrid[8][7] = -2;
+		retGrid[8][8] = -2;
+
+		// generate a grid with pre compiled moves
+		retGrid[goalCoords[1]][goalCoords[0]] = 0;
+		int numMove = 0;
+
+		this.heuristicFiller(retGrid, goalCoords[0], goalCoords[1], numMove);
+		numMove++;
+		while (checkGridFilled(retGrid)) {
+			for (int i = 0; i < retGrid.length; i++) {
+				for (int j = 0; j < retGrid[i].length; j++) {
+					if (retGrid[i][j] == numMove) {
+						this.heuristicFiller(retGrid, j, i, numMove);
+					}
+				}
+			}
+			numMove++;
+		}
+
+		print(retGrid);
+
+		return retGrid;
+	}
+	
 	public ArrayList<Board>createChildrenBoards() {
 		ArrayList<Board> res = new ArrayList<Board>();
 		for (int i = 0; i < 4; i++)
