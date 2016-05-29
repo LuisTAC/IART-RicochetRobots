@@ -1,6 +1,7 @@
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 
@@ -95,6 +96,7 @@ public class Solver {
 		b.setCurrGoal(12);
 		
 		ArrayList<Board> res = astar(b);
+		Collections.reverse(res);
 		
 		FileOutputStream out = null;
 		try {
