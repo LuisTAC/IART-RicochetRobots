@@ -2,7 +2,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Main {
+public class Solver {
 
 	public static void main(String[] args) {
 		Board b = new Board(1);
