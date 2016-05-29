@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 enum Orientation { H, V };
 
 public class Wall {
@@ -28,6 +30,20 @@ public class Wall {
 	public void setCoords(int x,int y) {
 		this.coords[0]=x;
 		this.coords[1]=y;
+	}
+	
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Wall))
+            return false;
+        if (obj == this)
+            return true;
+        
+        Wall rhs = (Wall)obj;
+        if(this.orientation!=rhs.orientation) return false;
+        
+        if(!Arrays.equals(this.coords, rhs.coords)) return false;
+        
+        return true;
 	}
 	
 }

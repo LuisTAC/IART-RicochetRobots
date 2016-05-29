@@ -407,4 +407,26 @@ public class Board {
 		return ret;
 	}
 	
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Board))
+            return false;
+        if (obj == this)
+            return true;
+        
+        Board rhs = (Board)obj;
+        if(!Arrays.equals(this.robots, rhs.robots)) return false;
+        
+        for(int i=0;i<targets.length;i++) {
+        	if(!Arrays.equals(this.targets[i], rhs.targets[i])) return false;
+        }
+        
+        if(!this.walls.equals(rhs.walls)) return false;
+        
+        if(this.currGoal!=rhs.currGoal) return false;
+        
+        if(!this.doneGoals.equals(rhs.doneGoals)) return false;
+        
+        return true;
+	}
+	
 }

@@ -1,3 +1,5 @@
+import java.util.Arrays;
+
 enum Color { B, G, R, Y };
 
 public class Robot {
@@ -33,6 +35,22 @@ public class Robot {
 	public void setCoords(int x, int y) {
 		this.coords[0]=x;
 		this.coords[1]=y;
+	}
+	
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Robot))
+            return false;
+        if (obj == this)
+            return true;
+        
+        Robot rhs = (Robot)obj;
+        if(!this.color.equals(rhs.color)) return false;
+        
+        if(!Arrays.equals(this.start, rhs.start)) return false;
+        
+        if(!Arrays.equals(this.coords, rhs.coords)) return false;
+        
+        return true;
 	}
 	
 }
