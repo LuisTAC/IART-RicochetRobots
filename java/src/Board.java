@@ -245,7 +245,7 @@ public class Board {
 	
 	// heuristic functions
 		
-	boolean checkGridFilled(int grid[][]) {
+	private boolean checkGridFilled(int grid[][]) {
 		for (int i = 0; i < grid.length; i++) {
 			for (int j = 0; j < grid.length; j++) {
 				if (grid[i][j] == -1)
@@ -256,7 +256,7 @@ public class Board {
 		return false;
 	}
 
-	void heuristicFiller(int v[][], int x, int y, int moveNum) {
+	private void heuristicFiller(int v[][], int x, int y, int moveNum) {
 		int max;
 		int min;
 
@@ -312,7 +312,7 @@ public class Board {
 		}
 	}
 
-	int[][] heuristicPreComp() {
+	public int[][] heuristicPreComp() {
 		int[][] retGrid = new int[16][16];
 
 		int goalIndex = this.getCurrGoal();
@@ -345,8 +345,6 @@ public class Board {
 			}
 			numMove++;
 		}
-
-		print(retGrid);
 
 		return retGrid;
 	}
